@@ -1,0 +1,4 @@
+Success!
+
+The chart {{ template "pca-manager-microservice.chart" . }} ({{ .Release.Name }}) has been
+successfully installed.

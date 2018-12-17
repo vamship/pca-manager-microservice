@@ -1,0 +1,84 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ template "pca-manager-microservice.fullname" . }}-pca-manager-api
+  labels:
+    app: {{ template "pca-manager-microservice.name" . }}
+    component: pca-manager-api
+    release: {{ .Release.Name }}
+    chart: {{ template "pca-manager-microservice.chart" . }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "pca-manager-microservice.name" . }}
+      component: pca-manager-api
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "pca-manager-microservice.name" . }}
+        component: pca-manager-api
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: pca-manager
+      volumes:
+        - name: appconfig
+          configMap:
+            name: {{ template "pca-manager-microservice.fullname" . }}-pca-manager-api
+        - name: appdata
+          emptyDir: {}
+      containers:
+        - name: api
+          image: {{ template "pca-manager-microservice.pca-manager-api.image" . }}
+          imagePullPolicy: {{ .Values.image.defaultPullPolicy }}
+          env:
+            - name: pcaManagerApi_production__app__serverId
+              valueFrom: 
+                secretKeyRef:
+                  name: pca-server-identity
+                  key: serverId
+            - name: pcaManagerApi_production__app__serverApiKey
+              valueFrom: 
+                secretKeyRef:
+                  name: pca-server-identity
+                  key: serverApiKey
+            - name: pcaManagerApi_production__log__level
+              value: {{ default "error" .Values.log.level }}
+            - name: pcaManagerApi_production__log__extremeLogging
+              value: {{ default "false" .Values.log.extremeLogging }}
+            - name: pcaManagerApi_production__app__updateAgentContainer
+              value: {{ default "vamship/pca-update-agent:2.0.2-0" .Values.app.updateAgentContainer }}
+            - name: pcaManagerApi_production__app__lockDir
+              value: '/etc/pca-manager-api/data'
+            - name: pcaManagerApi_production__app__licenseDir
+              value: '/etc/pca-manager-api/data'
+            - name: pcaManagerApi_production__app__licenseServerEndpoint
+              value: {{required "Value app.licenseServerEndpoint is required" .Values.app.licenseServerEndpoint }}
+            - name: pcaManagerApi_production__app__stsEndpoint
+              value: {{required "Value app.stsEndpoint is required" .Values.app.stsEndpoint }}
+            - name: pcaManagerApi_production__app__credentialProviderEndpoint
+              value: {{required "Value app.credentialProviderEndpoint is required" .Values.app.credentialProviderEndpoint }}
+            - name: pcaManagerApi_production__app__callbackEndpoint
+              value: {{required "Value app.callbackEndpoint is required" .Values.app.callbackEndpoint }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /external/health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /external/health/ready
+              port: http
+          volumeMounts:
+            - name: appconfig
+              mountPath: /etc/pca-manager-api/config
+              subPath: config
+            - name: appdata
+              mountPath: /etc/pca-manager-api/data
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

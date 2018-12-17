@@ -1,0 +1,14 @@
+{
+  "@vamship/generator-helm": {
+    "projectName": "pca-manager-microservice",
+    "projectDescription": "Helm chart for the installation of the pca manager service",
+    "projectKeywords": [
+      "private cloud appliance",
+      "software update"
+    ],
+    "projectIcon": "",
+    "projectAppVersion": "",
+    "authorName": "Vamshi K Ponnapalli",
+    "authorEmail": "vamshi.ponnapalli@gmail.com"
+  }
+}

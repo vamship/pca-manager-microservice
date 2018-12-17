@@ -1,0 +1,24 @@
+{{- /*
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: {{ template "pca-manager-microservice.fullname" . }}
+  labels:
+    app: {{ template "pca-manager-microservice.name" . }}-pca-manager-api
+    chart: {{ template "pca-manager-microservice.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+spec:
+  tls:
+    - hosts:
+      - {{required "Value api.hostname is required" .Values.api.hostname }}
+  rules:
+    -  host: {{required "Value api.hostname is required" .Values.api.hostname }}
+      http:
+        paths:
+          - path: /_admin
+            backend:
+              serviceName: {{ template "pca-manager-microservice.fullname" . }}-pca-manager-api
+              servicePort: http
+*/ -}}

@@ -1,0 +1,21 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "pca-manager-microservice.fullname" . }}-pca-manager-api
+  labels:
+    app: {{ template "pca-manager-microservice.name" . }}
+    component: pca-manager-api
+    chart: {{ template "pca-manager-microservice.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "pca-manager-microservice.name" . }}
+    component: pca-manager-api
+    release: {{ .Release.Name }}

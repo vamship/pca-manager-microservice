@@ -1,0 +1,10 @@
+apiVersion: v1
+name: pca-manager-microservice
+version: 0.0.1
+description: Helm chart for the installation of the pca manager service
+keywords:
+  - private cloud appliance
+  - software update
+maintainers:
+  - name: Vamshi K Ponnapalli
+    email: vamshi.ponnapalli@gmail.com
